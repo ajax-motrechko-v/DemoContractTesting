@@ -35,11 +35,23 @@ class PetApiProviderPactTest {
     @Autowired
     private lateinit var petService: PetService
 
+    // Pact provider test lifecycle (corrected and clarified)
+    // 1. Set up the target (e.g., HttpTestTarget) to direct Pact where to send real HTTP requests.
+    // 2. Load Pact contract files (e.g., from build/pacts or a Pact Broker).
+    // 3. For each interaction, initialize provider state using @State methods.
+    // 4. Inside each state method, use mocks (e.g., Mockito) or seed test data to simulate expected behavior.
+    // 5. Pact sends a real HTTP request to the provider and verifies that the response matches the contract.
+    // 6. If all interactions pass, the provider test succeeds and confirms contract compliance.
+
+    // Set up the target for Pact verification
     @BeforeEach
     fun before(context: PactVerificationContext) {
         context.target = HttpTestTarget("localhost", port)
     }
 
+
+    // Pact verification test runner
+    // This method will be invoked for each interaction defined in the Pact files
     @TestTemplate
     @ExtendWith(PactVerificationInvocationContextProvider::class)
     fun pactVerificationTestTemplate(context: PactVerificationContext) {

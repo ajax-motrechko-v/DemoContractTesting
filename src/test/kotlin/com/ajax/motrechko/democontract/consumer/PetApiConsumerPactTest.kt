@@ -21,6 +21,15 @@ import java.net.http.HttpResponse
 @PactTestFor(providerName = "pet_provider")
 class PetApiConsumerPactTest {
 
+    // Pact consumer test lifecycle (clear and concise)
+    // 1. Define the expected interaction using the @Pact method (request + expected response).
+    // 2. Start a mock HTTP server with Pact using @PactTestFor and the defined interaction.
+    // 3. The consumer client (e.g., PetApi) sends a real HTTP request to the mock server.
+    // 4. The mock server responds based on the Pact interaction defined earlier.
+    // 5. Assertions verify that the consumer correctly handles and parses the response.
+    // 6. If the interaction matches and assertions pass, Pact generates a Pact contract file (.json).
+    // 7. This file can later be verified by the provider to ensure both sides are in sync.
+
     // --- CONTRACT: GET /api/pets (with DSL)
     @Pact(consumer = CONSUMER, provider = PROVIDER)
     fun getAllPetsPact(builder: PactDslWithProvider): V4Pact {
