@@ -7,35 +7,27 @@ import au.com.dius.pact.provider.junitsupport.Provider
 import au.com.dius.pact.provider.junitsupport.State
 import au.com.dius.pact.provider.junitsupport.loader.PactFolder
 import com.ajax.motrechko.democontract.DemoContractApplication
+import com.ajax.motrechko.democontract.config.TestConfig
 import com.ajax.motrechko.democontract.model.Pet
 import com.ajax.motrechko.democontract.service.PetService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestTemplate
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.context.annotation.Bean
 
 @Provider("pet_provider")
 @PactFolder("build/pacts")
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = [PetApiProviderPactTest.TestConfig::class, DemoContractApplication::class]
+    classes = [TestConfig::class, DemoContractApplication::class]
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PetApiProviderPactTest {
-
-    @TestConfiguration
-    class TestConfig {
-        @Bean
-        fun petService(): PetService = mock(PetService::class.java)
-    }
 
     @LocalServerPort
     private var port: Int = 0

@@ -19,7 +19,7 @@ import java.net.http.HttpResponse
 
 @ExtendWith(PactConsumerTestExt::class)
 @PactTestFor(providerName = "pet_provider")
-class PetApiConsumerPactTest2 {
+class PetApiConsumerPactTest {
 
     // --- CONTRACT: GET /api/pets (with DSL)
     @Pact(consumer = CONSUMER, provider = PROVIDER)
@@ -72,8 +72,22 @@ class PetApiConsumerPactTest2 {
     // --- CONTRACT: POST /api/pets (uses PactDslJsonBody for request and response)
     @Pact(consumer = CONSUMER, provider = PROVIDER)
     fun createPetPact(builder: PactDslWithProvider): V4Pact {
-        val requestBody = buildPetBody("Rex", "Dog", 2, "German Shepherd", "Loyal and protective")
-        val responseBody = buildPetBody("Rex", "Dog", 2, "German Shepherd", "Loyal and protective", id = 6)
+        val requestBody = buildPetBody(
+            "Rex",
+            "Dog",
+            2,
+            "German Shepherd",
+            "Loyal and protective"
+        )
+
+        val responseBody = buildPetBody(
+            "Rex",
+            "Dog",
+            2,
+            "German Shepherd",
+            "Loyal and protective",
+            6
+        )
 
         return builder
             .given("Pet service is available")
