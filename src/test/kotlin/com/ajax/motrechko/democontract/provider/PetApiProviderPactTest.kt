@@ -5,7 +5,9 @@ import au.com.dius.pact.provider.junit5.PactVerificationContext
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider
 import au.com.dius.pact.provider.junitsupport.Provider
 import au.com.dius.pact.provider.junitsupport.State
-import au.com.dius.pact.provider.junitsupport.loader.PactFolder
+import au.com.dius.pact.provider.junitsupport.VerificationReports
+import au.com.dius.pact.provider.junitsupport.loader.PactBroker
+import au.com.dius.pact.provider.junitsupport.loader.PactBrokerAuth
 import com.ajax.motrechko.democontract.DemoContractApplication
 import com.ajax.motrechko.democontract.config.TestConfig
 import com.ajax.motrechko.democontract.model.Pet
@@ -21,7 +23,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 
 @Provider("pet_provider")
-@PactFolder("build/pacts")
+@PactBroker(
+    host = "localhost",
+    port = "9292",
+    scheme = "http",
+    authentication = PactBrokerAuth(username = "pact", password = "pact")
+)
+@VerificationReports("console")
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = [TestConfig::class, DemoContractApplication::class]
@@ -47,6 +55,7 @@ class PetApiProviderPactTest {
     @BeforeEach
     fun before(context: PactVerificationContext) {
         context.target = HttpTestTarget("localhost", port)
+        System.setProperty("pact.verifier.publishResults", "true")
     }
 
 

@@ -1,0 +1,17 @@
+FROM pactfoundation/pact-broker:latest
+
+# Environment variables for the Pact Broker
+ENV PACT_BROKER_PORT=9292 \
+    PACT_BROKER_DATABASE_ADAPTER=postgres \
+    PACT_BROKER_DATABASE_USERNAME=postgres \
+    PACT_BROKER_DATABASE_PASSWORD=postgres \
+    PACT_BROKER_DATABASE_HOST=postgres \
+    PACT_BROKER_DATABASE_NAME=postgres \
+    PACT_BROKER_LOG_LEVEL=INFO \
+    PACT_BROKER_BASIC_AUTH_USERNAME=pact \
+    PACT_BROKER_BASIC_AUTH_PASSWORD=pact \
+    PACT_BROKER_ALLOW_PUBLIC_READ=true
+
+EXPOSE 9292
+
+CMD ["pact-broker"]

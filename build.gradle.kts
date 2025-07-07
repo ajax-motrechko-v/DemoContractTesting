@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.5.3"
     id("io.spring.dependency-management") version "1.1.7"
     id("org.openapi.generator") version "7.4.0"
+    id("au.com.dius.pact") version "4.6.8"
 }
 
 group = "com.ajax.motrechko"
@@ -92,4 +93,28 @@ sourceSets {
 // Make sure the OpenAPI code is generated before compilation
 tasks.compileKotlin.configure {
     dependsOn(tasks.openApiGenerate)
+}
+
+buildscript {
+    dependencies {
+        classpath("au.com.dius.pact.provider:gradle:4.6.8")
+    }
+}
+
+// Configure Pact plugin
+pact {
+    publish {
+        pactBrokerUrl = "http://localhost:9292"
+        pactDirectory = "build/pacts"
+        pactBrokerUsername = "pact"
+        pactBrokerPassword = "pact"
+        tags = listOf("latest", "dev")
+        version = "1.0.${System.currentTimeMillis()}"
+    }
+
+    broker {
+        pactBrokerUrl = "http://localhost:9292"
+        pactBrokerUsername = "pact"
+        pactBrokerPassword = "pact"
+    }
 }

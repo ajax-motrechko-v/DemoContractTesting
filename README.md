@@ -86,9 +86,31 @@ The contract testing workflow in this project follows these steps:
 
 1. **Define Contracts**: The consumer defines contracts that specify the expected requests and responses for each API endpoint.
 2. **Generate Pact Files**: Running the consumer tests generates Pact files (JSON files) that contain the contracts.
-3. **Share Pact Files**: The Pact files are shared with the provider (in this project, they're stored in the `build/pacts/` directory).
-4. **Verify Provider**: The provider tests load the Pact files and verify that the provider implementation meets the expectations defined in the contracts.
+3. **Publish to Pact Broker**: The Pact files are published to the Pact Broker, which serves as a central repository for contracts.
+4. **Verify Provider**: The provider tests fetch the contracts from the Pact Broker and verify that the provider implementation meets the expectations defined in the contracts.
 5. **Continuous Integration**: In a real-world scenario, these tests would be part of a CI/CD pipeline to ensure contracts are always honored.
+
+### Running the Pact Broker
+
+This project includes a Docker setup for running the Pact Broker locally. To start the Pact Broker:
+
+```bash
+docker-compose up -d
+```
+
+The Pact Broker will be available at http://localhost:9292. You can access it with the following credentials:
+- Username: pact
+- Password: pact
+
+### Publishing Contracts to the Pact Broker
+
+After running the consumer tests, you can publish the generated Pact files to the Pact Broker:
+
+```bash
+./gradlew pactPublish
+```
+
+This will publish the Pact files to the Pact Broker with the version specified in the build.gradle.kts file.
 
 ### Consumer Tests in Detail
 
@@ -172,7 +194,7 @@ The provider tests (`PetApiProviderPactTest`) verify that the provider meets the
 
 1. **Pact Annotations**:
    - `@Provider("pet_provider")`: Specifies the provider name (must match the consumer's definition)
-   - `@PactFolder("build/pacts")`: Specifies where to find the Pact files
+   - `@PactBroker`: Specifies the Pact Broker details for fetching contracts instead of using local files. This annotation includes parameters for the host, port, scheme, and authentication details for the Pact Broker.
    - `@SpringBootTest`: Starts the Spring Boot application for testing
    - `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`: Ensures a single instance of the test class is used
 
@@ -242,6 +264,17 @@ Using a generated client has several advantages:
 1. **Type Safety**: The client provides type-safe methods for interacting with the API.
 2. **Consistency**: The client is generated from the same specification that defines the API, ensuring consistency.
 3. **Realistic Testing**: Using the actual client that consumers would use makes the tests more realistic.
+
+### Benefits of Using a Pact Broker
+
+The Pact Broker provides several advantages over sharing Pact files via the file system:
+
+- **Centralized Contract Repository**: All contracts are stored in a single location, making them easier to manage and access
+- **Versioning**: Contracts are versioned, allowing you to track changes over time
+- **Can-I-Deploy**: The Pact Broker provides a "can-i-deploy" feature that tells you whether it's safe to deploy a service based on whether its contracts are compatible with the services it integrates with
+- **Webhooks**: The Pact Broker can trigger webhooks when contracts change, enabling automated verification in CI/CD pipelines
+- **Visualizations**: The Pact Broker provides visualizations of the relationships between services, making it easier to understand the impact of changes
+- **Cross-Team Collaboration**: Teams can share contracts without needing direct access to each other's code repositories
 
 ### Benefits of Contract Testing
 
