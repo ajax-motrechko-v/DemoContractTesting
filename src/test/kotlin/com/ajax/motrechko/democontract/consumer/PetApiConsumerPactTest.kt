@@ -6,6 +6,7 @@ import au.com.dius.pact.consumer.junit5.PactConsumerTestExt
 import au.com.dius.pact.consumer.junit5.PactTestFor
 import au.com.dius.pact.core.model.V4Pact
 import au.com.dius.pact.core.model.annotations.Pact
+import au.com.dius.pact.core.pactbroker.PactBrokerClient.Companion.PROVIDER
 import com.ajax.motrechko.democontract.client.api.PetApi
 import com.ajax.motrechko.democontract.client.model.Pet
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,7 +19,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 @ExtendWith(PactConsumerTestExt::class)
-@PactTestFor(providerName = "pet_provider")
+@PactTestFor(providerName = PROVIDER)
 class PetApiConsumerPactTest {
 
     // Pact consumer test lifecycle (clear and concise)
@@ -110,6 +111,19 @@ class PetApiConsumerPactTest {
             .toPact(V4Pact::class.java)
     }
 
+    // --- CONTRACT: DELETE /api/pets/1
+    @Pact(consumer = CONSUMER, provider = PROVIDER)
+    fun deletePetPact(builder: PactDslWithProvider): V4Pact {
+        return builder
+            .given("Pet with ID 1 can be deleted")
+            .uponReceiving("DELETE /api/pets/1 deletes the pet")
+            .path("/api/pets/1")
+            .method("DELETE")
+            .willRespondWith()
+            .status(204)
+            .toPact(V4Pact::class.java)
+    }
+
     // --- TEST: GET /api/pets using OpenAPI-generated PetApi client
     @Test
     @PactTestFor(pactMethod = "getAllPetsPact")
@@ -186,6 +200,16 @@ class PetApiConsumerPactTest {
         assertEquals("Dog", createdPet.type)
         assertEquals(2, createdPet.age)
         assertEquals("German Shepherd", createdPet.breed)
+    }
+
+    // --- TEST: DELETE /api/pets/1 using OpenAPI client
+    @Test
+    @PactTestFor(pactMethod = "deletePetPact")
+    fun deletePet(mockServer: MockServer) {
+        val apiClient = PetApi(mockServer.getUrl())
+        val response = apiClient.deletePetWithHttpInfo(1)
+
+        assertEquals(204, response.statusCode)
     }
 
     private fun buildPetBody(

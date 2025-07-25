@@ -29,7 +29,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
     scheme = "http",
     authentication = PactBrokerAuth(username = "pact", password = "pact")
 )
-@VerificationReports("console")
+@VerificationReports("console") // Optional: can be "console", "file", or "none". Used to specify where to output verification results.
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = [TestConfig::class, DemoContractApplication::class]
@@ -68,6 +68,7 @@ class PetApiProviderPactTest {
     }
 
     // --- STATE: GET /api/pets
+    // This state is used to set up the initial condition for the interaction
     @State("Pets exist in the system")
     fun setupPetsExist() {
         whenever(petService.getAllPets()).thenReturn(
@@ -92,5 +93,11 @@ class PetApiProviderPactTest {
         whenever(petService.createPet(any())).thenReturn(
             Pet(6, "Rex", "Dog", 2, "German Shepherd", "Loyal and protective")
         )
+    }
+
+    //  --- STATE: DELETE /api/pets/1
+    @State("Pet with ID 1 can be deleted")
+    fun setupPetWithId1CanBeDeleted() {
+        whenever(petService.deletePet(1)).thenReturn(true)
     }
 }
